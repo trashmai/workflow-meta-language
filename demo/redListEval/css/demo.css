@@ -1,4 +1,6 @@
 #show_text_data {
+  top: 10px;
+  position: relative;
   border: 1px black solid;
 }
 

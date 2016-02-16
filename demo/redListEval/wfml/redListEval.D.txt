@@ -1,0 +1,19 @@
+START
+// Criteria D - Very small or restricted population
+
+AdultNumberInPopulation
+LT cd1 1000	SET RedListClass VU	SET Subcriteria D1	GOTO FIN
+LT cd1 250	SET RedListClass EN	SET Subcriteria D	GOTO FIN
+LT cd1 50	SET RedListClass CR	SET Subcriteria D	GOTO FIN
+
+AOOorNumOfLocationIsRestricted
+GTE b1 20	GTE b8 20	GT b15 5	GOTO NF
+
+ThreatExistsAndBadEffect
+// find no cd9 and cd10
+GOTO NF
+
+NF
+SET RedListClass NF
+
+FIN

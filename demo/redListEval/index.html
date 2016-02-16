@@ -1,15 +1,5 @@
 <html>
 <head>
-</head>
-
-<body>
-</body>
-
-</html>
-
-
-<html>
-<head>
 <link href="/workflow/css/cy-style.css" rel="stylesheet" />
 <link href="./css/demo.css" rel="stylesheet" />
 <script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
@@ -49,6 +39,8 @@
   <script src='./js/wf-plugin/wf-redlist.A.js'></script>
   <script src='./js/wf-plugin/wf-redlist.B.js'></script>
   <script src='./js/wf-plugin/wf-redlist.C.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.D.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.E.js'></script>
 
 
 
@@ -58,7 +50,7 @@
   var col = url_query.col || '5';
 
   function relocation () {
-    window.location.href='cy.html?ns='+$('#criteria').val()+'&'+'col='+$('#species').val();
+    window.location.href='?ns='+$('#criteria').val()+'&'+'col='+$('#species').val();
   }
 
 
@@ -74,7 +66,7 @@
       vname_ids.push(idx);
     }
 
-    var criteria = ['A', 'B', 'C'];
+    var criteria = ['A', 'B', 'C', 'D', 'E'];
     $('#criteria').html(buildOpts(criteria, undefined, ns));
     $('#species').html(buildOpts(vname_ids, vnames, col));
     $wf().runWith("./wfml/redListEval."+ns+".txt", ns, data[col]);
