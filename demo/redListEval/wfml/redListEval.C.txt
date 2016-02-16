@@ -1,0 +1,53 @@
+START
+
+CriteriaCInit
+SET RedListClass.C1 NF
+SET RedListClass.C2 NF
+SET RedListClass.C2a NF
+SET RedListClass.C2b NF
+SET RedListClass.C NF
+
+PopulationSize
+// cd1,cd2,cd3 暫且先採用cd1
+LT cd1 10000	SET RedListClass.C VU
+LT cd1 2500	SET RedListClass.C EN
+LT cd1 250	SET RedListClass.C CR
+EQ RedListClass.C NF	GOTO NF
+
+PopulationSizeDown
+FUNC inputYesNo 族群是否有持續下降？
+EQ inputYesNo N	GOTO NF
+
+PopulationSizeDownRateEstimatable
+//C1
+//有資料欄位可表達EN與CR嗎？
+EQ b26 A	GOTO SetC1toVU
+EQ b27 A	GOTO SetC1toVU
+GOTO DownRateUnknown
+
+SetC1toVU
+SET RedListClass.C1 VU
+
+DownRateUnknown
+// a(i)
+LT cd6 1000	SET RedListClass.C2 VU	SET RedListClass.C2a a(i)
+LT cd6 250	SET RedListClass.C2 EN	SET RedListClass.C2a a(i)
+LT cd6 50	SET RedListClass.C2 CR	SET RedListClass.C2a a(i)
+// a(ii) 沒有欄位, 先略過
+
+CriticalChanges
+// C2 from b33,b35
+EQ b33 Y	SET RedListClass.C2b b
+EQ b35 Y	SET RedListClass.C2b b
+
+EndemicSpeciesCalibration
+// 這要怎麼處理？ rc1,rc2,rc3,rc4
+
+C1orC2
+EQ RedListClass.C1 NF	EQ RedListClassC2 NF	GOTO NF
+GOTO FIN
+
+NF
+SET RedListClass NF
+
+FIN

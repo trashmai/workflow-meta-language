@@ -1,0 +1,19 @@
+#show_text_data {
+  border: 1px black solid;
+}
+
+#display_message_box {
+  display: none;
+}
+
+#blabla_wrapper {
+  float: left;
+  height: 80px;
+}
+
+#export_options {
+  z-index: 1;
+  position: absolute;
+  top: 5px;
+  left: 300px;
+}

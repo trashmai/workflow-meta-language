@@ -1,0 +1,46 @@
+START
+//define function "inputYesNo", parameter for prompt message/question
+FUNC inputYesNo 族群是否有衰減的現象？
+EQ inputYesNo N	GOTO NF
+EQ inputYesNo Y	GOTO OverTenYearsOr3Gens
+
+OverTenYearsOr3Gens
+FUNC toYears a1,a5,a6
+LT ToYears 10 GOTO NF
+
+WhenDoesReductionHappen
+// 缺少"跨過去到未來"的欄位
+FUNC timePeriod a4,a5,a9 true
+EQ timePeriod 過去	GOTO IfKnowingReductionStatusAndCause
+EQ timePeriod 未來	SET category A3	GOTO DegreeOfReduction
+EQ timePeriod 從過去到未來 SET category A4	GOTO DegreeOfReduction
+GOTO NF
+
+IfKnowingReductionStatusAndCause
+//判斷Y或N的條件不明確，需要加強
+FUNC ifKnowning a11,a12
+EQ ifKnowning Y	SET category A1
+EQ ifKnowning N	SET category A2
+GOTO DegreeOfReduction
+
+DegreeOfReduction
+SET RedListClass NF
+EQ category A1	LTE a4 -50	SET RedListClass VU
+EQ category A1	LTE a4 -70	SET RedListClass EN
+EQ category A1	LTE a4 -90	SET RedListClass CR
+NE category A1	LTE a4 -30	SET RedListClass VU
+NE category A1	LTE a4 -50	SET RedListClass EN
+NE category A1	LTE a4 -70	SET RedListClass CR
+EQ RedListClass NF	GOTO NF
+GOTO BasisOfReduction
+
+BasisOfReduction
+FUNC getBasis a7,a8,a10
+EQ getBasis N	GOTO NF
+SET subCriteria getBasis
+GOTO FIN
+
+NF
+SET RedListClass NF
+
+FIN

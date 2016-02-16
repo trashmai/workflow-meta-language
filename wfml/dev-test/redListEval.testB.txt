@@ -1,0 +1,62 @@
+START
+
+EOO
+// EOO workflow
+FUNC fromEOO b9,b2,b10,b11,b3,b4
+LT fromEOO 100	SET RedListClass.B1 CR	GOTO B1a
+LT fromEOO 5000	SET RedListClass.B1 EN	GOTO B1a
+LT fromEOO 20000	SET RedListClass.B1 VU	GOTO B1a
+SET RedListClass.B1 NF
+GOTO AOO
+
+B1a
+// 因為欄位沒有針對B1,B2區分所以其實B1a,B1b,B1c & B2a,B2b,B2c都在跑一樣的東西
+FUNC NumberOfLocationsOrSubpopulations b15
+EQ NumberOfLocationsOrSubpopulations 1	SET RedListClass.Ba CR	GOTO B1b
+LTE NumberOfLocationsOrSubpopulations 5	SET RedListClass.Ba EN	GOTO B1b
+LTE NumberOfLocationsOrSubpopulations 10	SET RedListClass.Ba VU	GOTO B1b
+SET RedListClass.Ba NF
+
+B1b
+FUNC NumOfGoingDown b17,b18,b23,b24,b26,b27
+LT NumOfGoingDown 1	SET RedListClass.Bb NF
+
+B1c
+FUNC NumOfCriticalChanges b29,b30,b33,b35
+LT NumOfCriticalChanges 1	SET RedListClass.Bc NF
+
+AOO
+// AOO workflow
+FUNC fromAOO b8,b1 eoo-aoo.php
+LT fromAOO 10	SET RedListClass.B2 CR	GOTO B2a
+LT fromAOO 500	SET RedListClass.B2 EN	GOTO B2a
+LT fromAOO 2000	SET RedListClass.B2 VU	GOTO B2a
+SET RedListClass.B2 NF
+EQ RedListClass.B1 NF	GOTO NF
+GOTO FIN
+
+B2a
+FUNC NumberOfLocationsOrSubpopulations b15
+EQ NumberOfLocationsOrSubpopulations 1	SET RedListClass.Ba CR	GOTO B2b
+LTE NumberOfLocationsOrSubpopulations 5	SET RedListClass.Ba EN	GOTO B2b
+LTE NumberOfLocationsOrSubpopulations 10	SET RedListClass.Ba VU	GOTO B2b
+SET RedListClass.Ba NF
+
+B2b
+FUNC NumOfGoingDown b17,b18,b23,b24,b26,b27
+LT NumOfGoingDown 1	SET RedListClass.Bb NF
+
+B2c
+FUNC NumOfCriticalChanges b29,b30,b33,b35
+LT NumOfCriticalChanges 1	SET RedListClass.Bc NF
+
+B1andB2Sustained
+FUNC b1b2_sustained RedListClass.B1a,RedListClass.B1b,RedListClass.B1c,RedListClass.B2a,RedListClass.B2b,RedListClass.B2c,RedListClass.Ba,RedListClass.Bb,RedListClass.Bc
+EQ b1b2_sustained N	GOTO NF
+GOTO FIN
+
+NF
+SET RedListClass NF
+
+FIN
+

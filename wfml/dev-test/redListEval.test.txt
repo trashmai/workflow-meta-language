@@ -1,0 +1,39 @@
+START
+// deprecated
+FUNC inputValue 是否得知該物種的分布範圍？輸入1代表EOO，輸入2代表AOO，輸入N代表不知道。,N
+EQ inputValue 1
+EQ inputValue 2
+
+B1
+FUNC fromEOO b9,b2,b10,b11,b3,b4 eoo-aoo.php
+LT fromEOO 20000	SET RedListClass.B1 VU	GOTO B1sub
+LT fromEOO 5000	SET RedListClass.B1 EN	GOTO B1sub
+LT fromEOO 100	SET RedListClass.B1 CR	GOTO B1sub
+SET RedListClass.B1 NF
+GOTO B2
+
+B1sub
+FUNC bsubTwoOutOfThree1 b15,b17,b18,b23,b24,b26,b27,b29,b30,b33,b35
+EQ bsubTwoOutOfThree1 NF	SET RedListClass.B1 NF
+
+B2
+FUNC fromAOO b8,b1 eoo-aoo.php
+LT fromAOO 2000	SET RedListClass.B2 VU	GOTO B2sub
+LT fromAOO 500	SET RedListClass.B2 EN	GOTO B2sub
+LT fromAOO 10	SET RedListClass.B2 CR	GOTO B2sub
+SET RedListClass.B2 NF
+EQ RedListClass.B1 NF	EQ RedListClass.B2 NF	GOTO NF
+
+B2sub
+FUNC bsubTwoOutOfThree2 b15,b17,b18,b23,b24,b26,b27,b29,b30,b33,b35
+EQ bsubTwoOutOfThree2 NF	SET RedListClass.B2 NF
+EQ RedListClass.B1 NF	EQ RedListClass.B2 NF	GOTO NF
+
+OutputB
+FUNC outputB RedListClass.B1,RedListClass.B2
+GOTO FIN
+
+NF
+SET RedListClass NF
+
+FIN

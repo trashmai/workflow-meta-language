@@ -1,0 +1,47 @@
+Q1
+//define function "inputYesNo", parameter for prompt message/question
+FUNC inputYesNo 族群是否有衰減的現象？
+EQ inputYesNo N	GOTO NF
+EQ inputYesNo Y	GOTO Q2
+
+Q2
+//define function q2, with parameters a1,a2,a3,a5,a6
+FUNC q2 a1,a2,a3,a5,a6 randomTime.php true
+//there is a tab (\t) between Y and GOTO
+NE q2 Y	GOTO NF
+//undefined next section so goto Q3 automatically
+
+Q3
+FUNC q3 a4,a5,a9 true
+EQ q3 過去	GOTO Q4
+EQ q3 未來	SET category A3	GOTO Q5
+EQ q3 從過去到未來 SET category A4	GOTO Q5
+GOTO NF
+
+Q4
+FUNC q4 a11,a12
+EQ q4 Y	SET category A1
+EQ q4 N	SET category A2
+GOTO Q5
+
+Q5
+SET RedListClass NF
+EQ category A1	LTE a4 -50	SET RedListClass VU
+EQ category A1	LTE a4 -70	SET RedListClass EN
+EQ category A1	LTE a4 -90	SET RedListClass CR
+NE category A1	LTE a4 -30	SET RedListClass VU
+NE category A1	LTE a4 -50	SET RedListClass EN
+NE category A1	LTE a4 -70	SET RedListClass CR
+EQ RedListClass NF	GOTO NF
+GOTO Q6
+
+Q6
+FUNC q6 a7,a8,a10
+EQ q6 N	GOTO NF
+SET subCriteria q6
+GOTO FIN
+
+NF
+SET RedListClass NF
+
+FIN
