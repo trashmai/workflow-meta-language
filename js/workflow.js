@@ -1,9 +1,33 @@
-(function (document, window) {
+(function (window) {
 
   'use strict';
 
   var $wf = window.$wf = function () {
     'use strict';
+
+    var text;
+    var sections;
+    var named_sections;
+    var sec_names;
+    var nextSection = 'START';
+    var currentSection;
+    var prevSection;
+    var currentLine;
+    var skipSection = false;
+    var rounds = {};
+    var funcFinished = {};
+
+    $wf.$cyToBeRemoved = [];
+
+    var cy_add = $wf.cy_add = function (eles) {
+      if (cy) {
+        return cy.add(eles);
+      }
+      else {
+        return [];
+      }
+    }
+
 
     var display_message = '';
     var ns;
@@ -31,8 +55,15 @@
         var br = '<br/>';
       }
       //document.write('<i style="' + styles + '">' + txt + '</i><br/>');
-      $wf[shared]['display_message'] += '<span style="' + styles + '">' + beginEl + txt + endEl + '</span>' + br;
-      $('div#display_message_box').html($wf[shared]['display_message']);
+
+      if (document && $('div#display_message_box').length) {
+        $wf[shared]['display_message'] += '<span style="' + styles + '">' + beginEl + txt + endEl + '</span>' + br;
+        $('div#display_message_box').html($wf[shared]['display_message']);
+      }
+      else {
+        console.log('<span style="' + styles + '">' + beginEl + txt + endEl + '</span>' + br);
+      }
+
     }
   
     var e = $wf.e = function (txt) {
@@ -60,6 +91,9 @@
     }
 
     function _call_function (meta) {
+
+      'use strict';
+
       if (meta[0].indexOf('.') > 0) {
         var tmpFuncParts = meta[0].split('.');
         var func_ns = tmpFuncParts[0];
@@ -92,11 +126,11 @@
       funcText = '<xmp>' + funcText + '</xmp>';
 
       var cyNode = {group:'nodes', data:{id:funcName, name:funcName, weight:200, faveColor:'#86B342', faveShape:'octagon', sec:funcText}};
-      var cyEdge = {group:'edges', data:{id:currentSection + '_' + funcName, original_label:JSON.stringify($wf._toJsonData(argStr, false)), faveColor:'#86B342', target:funcName, source:currentSection}};
+      var cyEdge = {group:'edges', data:{id:currentSection + '_' + funcName, original_label:JSON.stringify($wf._toJsonData(argStr, false)), faveColor:'#86B342', target:funcName, source:currentSection}, classes:'function_call'};
       //$wf.$cyData.nodes.push(cyNode);
-      cy.add([cyNode]);
+      cy_add([cyNode]);
       //$wf.$cyData.edges.push(cyEdge);
-      cy.add([cyEdge]);
+      cy_add([cyEdge]);
 
 
       if (typeof $wf[func_ns][funcName] === 'function') {
@@ -238,6 +272,7 @@
       }
 
       m('SET ' + variable + ' to ' + value);
+      if (!keyOp[currentSection]) keyOp[currentSection] = [];
       if (keyOp[currentSection].indexOf('set ' + variable + ' to ' + value) == -1) {
         keyOp[currentSection].push('set ' + variable + ' to ' + value);
       }
@@ -367,7 +402,7 @@
     }
 
 
-    function _behave_sec (sec_id, window, document) {
+    function _behave_sec (sec_id, window) {
 
       if (sec_id !== 'PAUSE') {
         skipSection = false;
@@ -436,7 +471,8 @@
           }
 
           if (prevSection && currentSection) {
-            if (prevSection !== currentSection && funcFinished[prevSection] !== false && ['FIN',  'ERROR', 'EOF', 'PAUSE'].indexOf(prevSection) == -1) {
+            //if (prevSection !== currentSection && funcFinished[prevSection] !== false && ['FIN',  'ERROR', 'EOF', 'PAUSE'].indexOf(prevSection) == -1) {
+            if (prevSection !== currentSection && ['FIN',  'ERROR', 'EOF', 'PAUSE'].indexOf(prevSection) == -1) {
               if (prevSectionLastLine.match('GOTO ')) {
                 var gotoLabel = prevSectionLastLine;
               }
@@ -446,8 +482,9 @@
               var cySecEdgeId = 'solid_' + prevSection + '_' + currentSection;
               var cySecEdge = {group:'edges', data:{id:cySecEdgeId, original_label: gotoLabel, faveColor:'#EDA1ED', target:currentSection, source:prevSection, strength:(65 + 5 * rounds[prevSection])}};
 
-              cy.$('#'+prevSection).data('sec', '<xmp>' + named_sections[sec_names.indexOf(prevSection)].section + '\n\n**key operation:\n' + keyOp[prevSection].join('\n') + '</xmp>');
-
+              if (cy) {
+                cy.$('#'+prevSection).data('sec', '<xmp>' + named_sections[sec_names.indexOf(prevSection)].section + '\n\n**key operation:\n' + keyOp[prevSection].join('\n') + '</xmp>');
+              }
 
               if ($wf.$cyToBeRemoved.indexOf('#' + prevSection + '_' + currentSection) == -1 ) {
                 $wf.$cyToBeRemoved.push('#' + prevSection + '_' + currentSection);
@@ -465,10 +502,10 @@
             }
             //*/
             
-            if (!cy.$('#'+cySecEdgeId).length && !!cySecEdge) {
-              cy.add([cySecEdge]);
+            if (cy && !cy.$('#'+cySecEdgeId).length && !!cySecEdge) {
+              cy_add([cySecEdge]);
             }
-            else if (!!cySecEdge) {
+            else if (cy && !!cySecEdge) {
               var cySecEdge = cy.$('#'+cySecEdgeId)[0];
               cySecEdge.data('original_label', gotoLabel);
               cySecEdge.data('label', '');
@@ -488,6 +525,14 @@
         }
       }
 
+      var done_counter = 0;
+      function done () {
+        cyRemove($wf.$cyToBeRemoved);
+        console.log('done:' + done_counter);
+        done_counter++;
+      }
+
+
       function lastPart(s, this_sec_id) {
           'use strict';
           m (s);
@@ -500,14 +545,14 @@
           }
 
           var cyResNode = {group:'nodes', data:{id:'RES', name:res, weight:200, faveColor:'#F56', faveShape:'ellipse', sec:'<xmp>'+$wf[ns].outputResult.toString()+'</xmp>'}, classes: 'red_list_class'};
-          var addRes = cy.add([cyResNode]);
-          if (addRes.length === 0) {
+          var addRes = cy_add([cyResNode]);
+          if (cy && addRes.length === 0) {
             cy.$('#RES').data('name', res);
           }
           var cyResEdge = {group:'edges', data:{id:this_sec_id + '_RES', original_label: '', faveColor:'#EDA1ED', target:'RES', source:this_sec_id, strength:80}};
-          cy.add([cyResEdge]);
+          cy_add([cyResEdge]);
           var cyResToLabelEdge = {group:'edges', data:{id:'RES_' + $wf.$cyData.label_node_id, original_label: '', faveColor:'#FFF', target:$wf.$cyData.label_node_id, source:'RES'}};
-          cy.add([cyResToLabelEdge]);
+          cy_add([cyResToLabelEdge]);
 
           if (currentLine.match('GOTO ')) {
             var gotoLabel = currentLine;
@@ -516,10 +561,13 @@
             var gotoLabel = 'GOTO NEXT';
           }
 
-          if (currentSection !== this_sec_id && funcFinished[currentSection] !== false && ['FIN', 'ERROR', 'EOF', 'PAUSE'].indexOf(currentSection) == -1) {
+          //if (currentSection !== this_sec_id && funcFinished[currentSection] !== false && ['FIN', 'ERROR', 'EOF', 'PAUSE'].indexOf(currentSection) == -1) {
+          if (currentSection !== this_sec_id && ['FIN', 'ERROR', 'EOF', 'PAUSE'].indexOf(currentSection) == -1) {
             var cyFinEdge = {group:'edges', data:{id:'solid_' + currentSection + '_' + this_sec_id, original_label: gotoLabel, faveColor:'#EDA1ED', target:this_sec_id, source:currentSection, strength:(65 + 5 * rounds[currentSection])}};
-            cy.add([cyFinEdge]);
-            cy.$('#'+currentSection).data('sec', '<xmp>' + named_sections[sec_names.indexOf(currentSection)].section + '\n\n**key operation:\n' + keyOp[currentSection].join('\n') + '</xmp>');
+            cy_add([cyFinEdge]);
+            if (cy) {
+              cy.$('#'+currentSection).data('sec', '<xmp>' + named_sections[sec_names.indexOf(currentSection)].section + '\n\n**key operation:\n' + keyOp[currentSection].join('\n') + '</xmp>');
+            }
 
             if ($wf.$cyToBeRemoved.indexOf('#' + currentSection + '_' + this_sec_id) == -1 ) {
               $wf.$cyToBeRemoved.push('#' + currentSection + '_' + this_sec_id);
@@ -528,13 +576,14 @@
           }
           else if (currentSection !== this_sec_id && ['FIN', 'ERROR', 'EOF', 'PAUSE'].indexOf(currentSection) == -1) {
             var cyFinEdge = {classes: 'questionable', group:'edges', data:{id:currentSection + '_' + this_sec_id, original_label: gotoLabel, faveColor:'#F5A45D', target:this_sec_id, source:currentSection, strength:(65 + 5 * rounds[currentSection])}};
-            cy.add([cyFinEdge]);
+            cy_add([cyFinEdge]);
           }
 
           currentSection = this_sec_id;
 
           var cyToggleEdge = {group:'edges', data:{id:'RES_dqbzhn', original_label: '', faveColor:'#EDA1ED', target:'dqbzhn', source:'RES'}};
-          cy.add([cyToggleEdge]);
+          cy_add([cyToggleEdge]);
+          done();
       }  
 
 
@@ -560,12 +609,11 @@
           break;
         default:
           m ('Continue...');
-          _behave_sec(nextSection, window, document);
+          _behave_sec(nextSection, window);
       }
 
       if (typeof makeCyLayout === 'function') {
         makeCyLayout();
-        cyRemove($wf.$cyToBeRemoved);
       }
     }
 
@@ -666,7 +714,7 @@
         if (typeof value === 'function') {
           var cyPrepareNode = {group:'nodes', data:{id:preFuncName, name:preFuncName, faveColor:'#6FB1FC', faveShape:'octagon', sec:'<xmp>'+value.toString()+'</xmp>'}};
           //$wf.$cyData.nodes.push(cyPrepareNode);
-          cy.add([cyPrepareNode]);
+          cy_add([cyPrepareNode]);
           return value(data);
         }
         return undefined;
@@ -690,9 +738,9 @@
           }) (adata);
         }
 
-        var cyPrepareEdge = {group:'edges', data:{id:'pre_'+funcName + '_' + funcName, original_label:JSON.stringify(adata), faveColor:'#6FB1FC', target:funcName, source:'pre_' + funcName}};
+        var cyPrepareEdge = {group:'edges', data:{id:'pre_'+funcName + '_' + funcName, original_label:JSON.stringify(adata), faveColor:'#6FB1FC', target:funcName, source:'pre_' + funcName}, classes:'preparation'};
         //$wf.$cyData.edges.push(cyPrepareEdge);
-        cy.add([cyPrepareEdge]);
+        cy_add([cyPrepareEdge]);
         return (function (a, b) {
           a = a || {};
           b = b || {};
@@ -713,7 +761,14 @@
 
       $wf[shared].general = function (argStr, funcName, url, _async) {
 
-        var fork = currentSection;
+        'use strict';
+
+        var fork;
+
+        if (!!currentSection) {
+          fork = currentSection;
+        }
+
         var api_url = './service/wf-dummy.txt';
 
         if (url === 'true') {
@@ -740,13 +795,17 @@
 
         funcFinished[fork] = false;
 
+        if (!$wf[ns][funcName]) {
+          console.log(ns + ':' + funcName);
+        }
+
         //*
         if ($wf[ns][funcName].retVal === undefined) {
 
           // 預設會等待I/O
           if (!async) {
             _pause();
-            //_behave_sec('PAUSE', window, document);
+            //_behave_sec('PAUSE', window);
           }
 
           e('Waiting for ' + funcName + '(url:' + url + ') to return value...');
@@ -768,27 +827,27 @@
                 skipSection = true;
                 nextSection = fork;
                 $wf[ns][funcName].retVal = retVal;
-                _behave_sec(nextSection, window, document);
+                _behave_sec(nextSection, window);
 
                 funcFinished[fork] = true;
 
-                var cyFuncEdge = {group:'edges', data:{id:funcName + '_' + fork, label:retVal, original_label:retVal, faveColor:'#86B342', target:fork, source:funcName}};
+                var cyFuncEdge = {group:'edges', data:{id:funcName + '_' + fork, label:retVal, original_label:retVal, faveColor:'#86B342', target:fork, source:funcName}, classes:'function_call'};
                 //$wf.$cyData.edges.push(cyFuncEdge);
-                cy.add([cyFuncEdge]);
+                cy_add([cyFuncEdge]);
 
                 var strUrl = url;
                 if (url !== true && url !== false && url !== undefined && url !== null) {
                   // if (url === undefined) strUrl = 'undefined';
                   var cyNode = {group:'nodes', data:{id:strUrl, name:strUrl, weight:200, faveColor:'#6FB1FC', faveShape:'triangle'}};
-                  var cyUrlEdge = {group:'edges', data:{id:strUrl + '_' + funcName, label: data, original_label:data, faveColor:'#6FB1FC', target:funcName, source:strUrl}};
-                  var cyReqUrlEdge = {group:'edges', data:{id:'orig_'+funcName + '_' + strUrl, original_label:JSON.stringify(_toJsonData(argStr, false)), faveColor:'#6FB1FC', target:strUrl, source:funcName}};
-                  var cyReqUrlEdge = {group:'edges', data:{id:'all_'+funcName + '_' + strUrl, original_label:JSON.stringify(reqData), faveColor:'#6FB1FC', target:strUrl, source:funcName}};
+                  var cyUrlEdge = {group:'edges', data:{id:strUrl + '_' + funcName, label: data, original_label:data, faveColor:'#6FB1FC', target:funcName, source:strUrl}, classes:'remote_api_call'};
+                  var cyReqUrlEdge = {group:'edges', data:{id:'orig_'+funcName + '_' + strUrl, original_label:JSON.stringify(_toJsonData(argStr, false)), faveColor:'#6FB1FC', target:strUrl, source:funcName}, classes:'remote_api_call'};
+                  var cyReqUrlEdge = {group:'edges', data:{id:'all_'+funcName + '_' + strUrl, original_label:JSON.stringify(reqData), faveColor:'#6FB1FC', target:strUrl, source:funcName}, classes:'remote_api_call'};
                   //$wf.$cyData.nodes.push(cyNode);
-                  cy.add([cyNode]);
+                  cy_add([cyNode]);
                   //$wf.$cyData.edges.push(cyUrlEdge);
-                  cy.add([cyUrlEdge]);
+                  cy_add([cyUrlEdge]);
                   //$wf.$cyData.edges.push(cyReqUrlEdge);
-                  cy.add([cyReqUrlEdge]);
+                  cy_add([cyReqUrlEdge]);
                 }
 
               }
@@ -796,16 +855,16 @@
                 e('*****Function:' + funcName + 'return undefined. Set to NULL');
                 skipSection = true;
                 nextSection = 'ERROR';
-                _behave_sec(nextSection, window, document);
+                _behave_sec(nextSection, window);
               }
             }
           );
         }
         else {
           var retVal = $wf[ns][funcName].retVal;
-          var cyFuncEdge = {group:'edges', data:{id:funcName + '_' + fork, label:retVal, original_label:retVal, faveColor:'#86B342', target:fork, source:funcName}};
+          var cyFuncEdge = {group:'edges', data:{id:funcName + '_' + fork, label:retVal, original_label:retVal, faveColor:'#86B342', target:fork, source:funcName}, classes:'function_call'};
           //$wf.$cyData.edges.push(cyFuncEdge);
-          cy.add([cyFuncEdge]);
+          cy_add([cyFuncEdge]);
           funcFinished[fork] = true;
         }
         //*/
@@ -813,23 +872,15 @@
       }
     }
 
-    var text;
-    var sections;
-    var named_sections;
-    var sec_names;
-    var nextSection = 'START';
-    var currentSection;
-    var prevSection;
-    var currentLine;
-    var skipSection = false;
-    var rounds = {};
-    var funcFinished = {};
-
     if (!$wf.$cyData) {
       $wf.$cyData = {};
     }
 
     function runWith (wfFile, namespace, data) {
+
+      if (!cy) {
+        $('#display_message_box').show();
+      }
 
       $wf.ns = ns = namespace;
       text = FileHelper.readStringFromFileAtPath (wfFile);
@@ -839,8 +890,6 @@
 
       // TODO: Data loading layer is needed.
       o("資料讀自: <a target='_blank' href='https://docs.google.com/spreadsheets/d/10UnX17y5Yfj0MJoPDlNmrUCOER4xnF-OodNgx6bb6T4/pub?gid=1851777821&single=true'>Column #("+$wf[ns]['欄位編號']+")</a>");
-
-      o("流程視覺化: <a target='_blank' href='cy.html?" + window.location.href.split('?').pop() + "'>見此</a>");
 
       //* 寫Label
       $wf.$cyData.label_node_id = 'default_label';
@@ -857,7 +906,6 @@
         text = text.replace('\n\n\n', '\n\n');
       }
 
-      $wf.$cyToBeRemoved = [];
       var thisCyNode = null;
       var prevCyNode = null;
       var cyEdge = null;
@@ -901,11 +949,11 @@
           }
           thisCyNode = {group:'nodes', data:{id:sec_name, name:sec_name, weight:500, faveColor:'#F5A45D', faveShape:'rectangle', sec:'<xmp>'+sec+'</xmp>'}, classes: classes};
           //$wf.$cyData.nodes.push(thisCyNode);
-          cy.add([thisCyNode]);
+          cy_add([thisCyNode]);
           if (prevCyNode) {
             cyEdge = {group:'edges', data:{id:(prevCyNode.data.id+'_'+thisCyNode.data.id), source:prevCyNode.data.id, target:thisCyNode.data.id, faveColor:'#F5A45D'}, classes:'questionable'};
             //$wf.$cyData.edges.push(cyEdge);
-            cy.add([cyEdge]);
+            cy_add([cyEdge]);
           }
           prevCyNode = thisCyNode;
         }
@@ -917,4 +965,4 @@
       runWith: runWith
     }
   }
-}) (document, window);
+}) (window);

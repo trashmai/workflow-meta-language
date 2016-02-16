@@ -5,6 +5,8 @@
 }
 
 #display_message_box {
+  //top: 10px;
+  //position: relative;
   display: none;
 }
 

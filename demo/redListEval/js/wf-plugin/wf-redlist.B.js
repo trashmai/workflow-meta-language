@@ -33,7 +33,7 @@
     var picked = pickValue.pickedArgValue;
 
     if (picked === undefined) {
-      return Infinity
+      return NaN
     }
     else {
       return picked;
@@ -70,7 +70,7 @@
     var picked = pickValue.pickedArgValue;
 
     if (picked === undefined) {
-      return Infinity
+      return NaN
     }
     else {
       return picked;
@@ -86,7 +86,7 @@
       return data.b15;
     }
     else {
-      return Infinity;
+      return NaN;
     }
   }
 

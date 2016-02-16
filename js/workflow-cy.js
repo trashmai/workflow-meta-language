@@ -60,14 +60,29 @@ $(function(){ // on dom ready
         .css({
           'label': 'data(label)',
           'color': '#000',
-          //'opacity': 0.666,
-          'width': 'mapData(strength, 70, 100, 2, 6)',
+          'opacity': 'mapData(strength, 70, 100, 0.7, 1)',
+          'width': 'mapData(strength, 70, 100, 2, 20)',
           'target-arrow-shape': 'triangle',
           'source-arrow-shape': 'circle',
-          'line-color': 'data(faveColor)',
-          //'line-color': 'mapData(strength, 20, 100, blue, red)',
-          'source-arrow-color': 'data(faveColor)',
-          'target-arrow-color': 'data(faveColor)'
+          //'line-color': 'data(faveColor)',
+          'line-color': 'mapData(strength, 70, 100, #6FB1FC, blue)',
+          //'source-arrow-color': 'mapData(strength, 70, 100, #DC90DC, red)',
+          //'target-arrow-color': 'mapData(strength, 70, 100, #DC90DC, red)'
+        })
+      .selector('edge.function_call')
+        .css({
+          'width': 2,
+          'line-color': '#777',
+        })
+      .selector('edge.remote_api_call')
+        .css({
+          'width': 2,
+          'line-color': '#999',
+        })
+      .selector('edge.preparation')
+        .css({
+          'width': 2,
+          'line-color': '#888',
         })
       .selector('edge.questionable')
         .css({
