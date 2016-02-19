@@ -1,9 +1,8 @@
 (function (window) {
 
   'use strict';
-
-  $wf = window.$wf;
-
+  var $wf = window.$wf;
+  if (!$wf) $wf = {};
   $wf.B = $wf.B || {};
 
   $wf.B.pre_fromAOO = function (data) {

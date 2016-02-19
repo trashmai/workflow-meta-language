@@ -1,11 +1,9 @@
 (function (window) {
 
   'use strict';
-
-  $wf = window.$wf;
-
+  var $wf = window.$wf;
+  if (!$wf) $wf = {};
   $wf.E = $wf.E || {};
-
 
   $wf.E.outputResult = function () {
     var argStr = 'RedListClass,Subcriteria';

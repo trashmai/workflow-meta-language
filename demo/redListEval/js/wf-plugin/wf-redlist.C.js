@@ -1,11 +1,9 @@
 (function (window) {
 
   'use strict';
-
-  $wf = window.$wf;
-
+  var $wf = window.$wf;
+  if (!$wf) $wf = {};
   $wf.C = $wf.C || {};
-
 
   $wf.C.outputResult = function () {
     var argStr = 'RedListClass,RedListClass.C,RedListClass.C1,RedListClass.C2,RedListClass.C2a,RedListClass.C2b';

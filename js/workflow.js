@@ -4,7 +4,6 @@
 
   var $wf = window.$wf = function () {
     'use strict';
-
     var text;
     var sections;
     var named_sections;
@@ -16,11 +15,13 @@
     var skipSection = false;
     var rounds = {};
     var funcFinished = {};
+    var actionStack = [];
+
 
     $wf.$cyToBeRemoved = [];
 
     var cy_add = $wf.cy_add = function (eles) {
-      if (cy) {
+      if (window.cy) {
         return cy.add(eles);
       }
       else {
@@ -61,7 +62,7 @@
         $('div#display_message_box').html($wf[shared]['display_message']);
       }
       else {
-        console.log('<span style="' + styles + '">' + beginEl + txt + endEl + '</span>' + br);
+        //console.log(beginEl + txt + endEl);
       }
 
     }
@@ -401,6 +402,9 @@
       }
     }
 
+    if (!done_counter) {
+      var done_counter = 0;
+    }
 
     function _behave_sec (sec_id, window) {
 
@@ -463,6 +467,9 @@
           }
           rounds[currentSection] ++;
           o(currentSection + ': round ' + rounds[currentSection], '', 'h3');
+
+          actionStack.push(currentSection);
+
           var lines = sec.split('\n');
           for (var j=0; j<lines.length; j++) {
             var line = lines[j];
@@ -482,7 +489,7 @@
               var cySecEdgeId = 'solid_' + prevSection + '_' + currentSection;
               var cySecEdge = {group:'edges', data:{id:cySecEdgeId, original_label: gotoLabel, faveColor:'#EDA1ED', target:currentSection, source:prevSection, strength:(65 + 5 * rounds[prevSection])}};
 
-              if (cy) {
+              if (window.cy) {
                 cy.$('#'+prevSection).data('sec', '<xmp>' + named_sections[sec_names.indexOf(prevSection)].section + '\n\n**key operation:\n' + keyOp[prevSection].join('\n') + '</xmp>');
               }
 
@@ -502,10 +509,10 @@
             }
             //*/
             
-            if (cy && !cy.$('#'+cySecEdgeId).length && !!cySecEdge) {
+            if (window.cy && !cy.$('#'+cySecEdgeId).length && !!cySecEdge) {
               cy_add([cySecEdge]);
             }
-            else if (cy && !!cySecEdge) {
+            else if (window.cy && !!cySecEdge) {
               var cySecEdge = cy.$('#'+cySecEdgeId)[0];
               cySecEdge.data('original_label', gotoLabel);
               cySecEdge.data('label', '');
@@ -525,13 +532,21 @@
         }
       }
 
-      var done_counter = 0;
-      function done () {
-        cyRemove($wf.$cyToBeRemoved);
-        console.log('done:' + done_counter);
+      function done (res) {
+        if (typeof cyRemove === 'function') {
+          cyRemove($wf.$cyToBeRemoved);
+        }
+        if (typeof makeCyLayout === 'function') {
+          makeCyLayout();
+        }
+
+        console.log(res);
+        console.log('workflow done');
+        $('#workflow_done_assertion').html('workflow done');
+        $('#workflow_result').html(res);
+
         done_counter++;
       }
-
 
       function lastPart(s, this_sec_id) {
           'use strict';
@@ -546,10 +561,10 @@
 
           var cyResNode = {group:'nodes', data:{id:'RES', name:res, weight:200, faveColor:'#F56', faveShape:'ellipse', sec:'<xmp>'+$wf[ns].outputResult.toString()+'</xmp>'}, classes: 'red_list_class'};
           var addRes = cy_add([cyResNode]);
-          if (cy && addRes.length === 0) {
+          if (window.cy && addRes.length === 0) {
             cy.$('#RES').data('name', res);
           }
-          var cyResEdge = {group:'edges', data:{id:this_sec_id + '_RES', original_label: '', faveColor:'#EDA1ED', target:'RES', source:this_sec_id, strength:80}};
+          var cyResEdge = {group:'edges', data:{id:this_sec_id + '_RES', original_label: '', faveColor:'#EDA1ED', target:'RES', source:this_sec_id, strength:75}};
           cy_add([cyResEdge]);
           var cyResToLabelEdge = {group:'edges', data:{id:'RES_' + $wf.$cyData.label_node_id, original_label: '', faveColor:'#FFF', target:$wf.$cyData.label_node_id, source:'RES'}};
           cy_add([cyResToLabelEdge]);
@@ -565,7 +580,7 @@
           if (currentSection !== this_sec_id && ['FIN', 'ERROR', 'EOF', 'PAUSE'].indexOf(currentSection) == -1) {
             var cyFinEdge = {group:'edges', data:{id:'solid_' + currentSection + '_' + this_sec_id, original_label: gotoLabel, faveColor:'#EDA1ED', target:this_sec_id, source:currentSection, strength:(65 + 5 * rounds[currentSection])}};
             cy_add([cyFinEdge]);
-            if (cy) {
+            if (window.cy) {
               cy.$('#'+currentSection).data('sec', '<xmp>' + named_sections[sec_names.indexOf(currentSection)].section + '\n\n**key operation:\n' + keyOp[currentSection].join('\n') + '</xmp>');
             }
 
@@ -583,9 +598,16 @@
 
           var cyToggleEdge = {group:'edges', data:{id:'RES_dqbzhn', original_label: '', faveColor:'#EDA1ED', target:'dqbzhn', source:'RES'}};
           cy_add([cyToggleEdge]);
-          done();
+
+          if (actionStack.length === 0) {
+            done(res);
+          }
       }  
 
+      var csIndex = actionStack.indexOf(currentSection)
+      if (csIndex > -1) {
+        actionStack.splice(csIndex, 1);
+      }
 
       switch (nextSection) {
         case 'FIN':
@@ -612,9 +634,6 @@
           _behave_sec(nextSection, window);
       }
 
-      if (typeof makeCyLayout === 'function') {
-        makeCyLayout();
-      }
     }
 
     var shared = 'shared';
@@ -808,6 +827,8 @@
             //_behave_sec('PAUSE', window);
           }
 
+          actionStack.push(funcName);
+
           e('Waiting for ' + funcName + '(url:' + url + ') to return value...');
           var reqData = _additionData(funcName, _toJsonData(argStr, false));
           $.when($.post(api_url, reqData)).then(
@@ -824,6 +845,12 @@
               if ($wf[ns][funcName].retVal !== retVal) {
                 e('Value recieved from ' + funcName + '(url:' + url + '), going to run section ' + fork + ' again.');
                 e('*****Function:' + funcName + '收到新值('+retVal+')，再次執行區塊:' + fork);
+
+                var funcIndex = actionStack.indexOf(funcName);
+                if (funcIndex > -1) {
+                  actionStack.splice(funcIndex, 1);
+                }
+
                 skipSection = true;
                 nextSection = fork;
                 $wf[ns][funcName].retVal = retVal;
@@ -878,7 +905,7 @@
 
     function runWith (wfFile, namespace, data) {
 
-      if (!cy) {
+      if (!window.cy) {
         $('#display_message_box').show();
       }
 
@@ -959,7 +986,7 @@
         }
       }
 
-      _behave_sec(nextSection);
+      _behave_sec(nextSection, window);
     }
     return {
       runWith: runWith

@@ -1,9 +1,8 @@
 (function (window) {
 
   'use strict';
-
   var $wf = window.$wf;
-
+  if (!$wf) $wf = {};
   $wf.A = $wf.A || {};
 
   $wf.A.toYears = function (api_data, argStr) {

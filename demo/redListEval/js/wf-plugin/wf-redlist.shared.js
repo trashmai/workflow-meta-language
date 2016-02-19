@@ -1,10 +1,9 @@
 (function (window) {
-  'use strict';
 
+  'use strict';
   var $wf = window.$wf;
-  if (!$wf.shared) {
-    $wf.shared = {};
-  }
+  if (!$wf) $wf = {};
+  $wf.shared = $wf.shared || {};
 
   $wf.shared.cyAddLabel = function () {
     var vname = $wf[$wf.ns]['欄位編號'];
