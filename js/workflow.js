@@ -14,7 +14,7 @@
     var currentLine;
     var skipSection = false;
     var rounds = {};
-    var funcFinished = {};
+    //var funcFinished = {};
     var actionStack = [];
 
 
@@ -812,7 +812,7 @@
           async = true;
         }
 
-        funcFinished[fork] = false;
+        // funcFinished[fork] = false;
 
         if (!$wf[ns][funcName]) {
           console.log(ns + ':' + funcName);
@@ -856,7 +856,7 @@
                 $wf[ns][funcName].retVal = retVal;
                 _behave_sec(nextSection, window);
 
-                funcFinished[fork] = true;
+                // funcFinished[fork] = true;
 
                 var cyFuncEdge = {group:'edges', data:{id:funcName + '_' + fork, label:retVal, original_label:retVal, faveColor:'#86B342', target:fork, source:funcName}, classes:'function_call'};
                 //$wf.$cyData.edges.push(cyFuncEdge);
@@ -892,7 +892,7 @@
           var cyFuncEdge = {group:'edges', data:{id:funcName + '_' + fork, label:retVal, original_label:retVal, faveColor:'#86B342', target:fork, source:funcName}, classes:'function_call'};
           //$wf.$cyData.edges.push(cyFuncEdge);
           cy_add([cyFuncEdge]);
-          funcFinished[fork] = true;
+          // funcFinished[fork] = true;
         }
         //*/
         return $wf[ns][funcName].retVal;

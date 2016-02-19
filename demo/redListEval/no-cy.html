@@ -1,0 +1,100 @@
+<html>
+<head>
+<link href="/workflow/css/cy-style.css" rel="stylesheet" />
+<link href="./css/demo.css" rel="stylesheet" />
+<script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
+<!--script src="/workflow/js/cytoscape.js"></script>
+<script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cose-bilkent/1.0.2/cytoscape-cose-bilkent.js"></script>
+<script src="/workflow/js/workflow-cy.js"></script-->
+<script src='/workflow/js/common.js'></script>
+<script src='./js/redlist-export-img.js'></script>
+</head>
+<body>
+  <!--div id='display_message_box'></div-->
+
+  <div id='cy_canvas'></div>
+
+  <div id='blabla_wrapper'>
+    <!--div id='wf_label'></div>
+    <div id='menu'>Criteria<select id='criteria' name='criteria' onchange='relocation()'></select>Speies<select id='species' name='species' onchange='relocation()'></select></div>
+    <div id='show_text_data'></div>
+    <div id='display_message_box'></div-->
+    <div id='workflow_done_assertion'></div>
+    <div id='workflow_result'></div>
+  </div>
+  <!--div id='export_options'>
+    <div class='options_wrapper'>
+      <label>輸出選項</label><input type='button' name='export_img' value='輸出' onclick='export_image()'/><a id='link_for_exported'></a><br/>
+      <label>範圍</label>
+      <input name='image_scope' type='radio' value='full' checked='checked'>完整
+      <input name='image_scope' type='radio' value='viewport'>部份
+      <br/>
+      <label>格式</label>
+      <input name='image_format' type='radio' value='png' checked='checked'>PNG
+      <input name='image_format' type='radio' value='jpg'>JPG
+    </div>
+  </div-->
+
+
+  <script src='/workflow/js/workflow.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.shared.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.A.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.B.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.C.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.D.js'></script>
+  <script src='./js/wf-plugin/wf-redlist.E.js'></script>
+
+  <script>
+
+  var ns = url_query.ns || 'B';
+  var col = url_query.col || '5';
+
+  function relocation () {
+    window.location.href='no-cy.html?ns='+$('#criteria').val()+'&'+'col='+$('#species').val();
+  }
+
+
+  function settings () {
+
+
+    var vnames = [];
+    var vname_ids = [];
+
+    for (var idx in data) {
+      var vname = data[idx]['欄位編號'];
+      vnames.push(vname);
+      vname_ids.push(idx);
+    }
+
+    var criteria = ['A', 'B', 'C', 'D', 'E'];
+    $('#criteria').html(buildOpts(criteria, undefined, ns));
+    $('#species').html(buildOpts(vname_ids, vnames, col));
+    $wf().runWith("./wfml/redListEval."+ns+".txt", ns, data[col]);
+
+  }
+
+  var data;
+  function show () {
+ 
+    if (!localStorage.redListVars) {
+      console.log('read data from google spreadsheet');
+      var timestamp = new Date().getTime();
+      var gss = 'https://docs.google.com/spreadsheets/d/10UnX17y5Yfj0MJoPDlNmrUCOER4xnF-OodNgx6bb6T4/pub?gid=1851777821&single=true&output=tsv';
+      $.get("./service/gspreadsheet.php?timestamp="+timestamp+"&q="+encodeURIComponent(gss)).done(function(jsonString){
+        localStorage.redListVars = jsonString;
+        data = JSON.parse(localStorage.redListVars);
+        settings();
+      });
+    }
+    else {
+      console.log('data cached in localStorage');
+      data = JSON.parse(localStorage.redListVars);
+      settings();
+    }
+  }
+
+  show();
+
+  </script>
+</body>
+</html>
