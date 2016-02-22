@@ -12,28 +12,49 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 from xvfbwrapper import Xvfb
+import json
 
-col = 3
-max_col = 161
+criterias = ['B', 'D']
+current_criteria = ''
+res = []
+start_from = 3
+
+def create_on_exist_update(haystack, dict_id, needle, key, value, new_element):
+  index = next((i for i, x in enumerate(haystack) if x[dict_id] == needle), -1)
+  if key != dict_id and index != -1:
+    haystack[index][key] = value
+  else:
+    haystack.append(new_element)
+  return haystack
 
 def ajax_complete(driver):
-  global col, max_col
+  global col, max_col, res, current_criteria
   try:
     # print driver.execute_script("return !!localStorage.redListVars")
     if 'workflow done' == driver.execute_script("return jQuery('#workflow_done_assertion').html()"):
-      print str(col) + ':' + driver.execute_script("return jQuery('#workflow_result').html()")
-      if col < max_col:
-        col += 1
-        ajax_automation_test(col)
+      species = driver.execute_script("return jQuery('#redlist_species').html()")
+      if ("" == species):
+        return True
+      result = driver.execute_script("return jQuery('#workflow_result').html()")
+      newEle = {}
+      newEle['species'] = species
+      newEle[current_criteria] = result
+      res = create_on_exist_update(haystack=res, dict_id='species', needle=species ,key=current_criteria, value=result, new_element=newEle)
+      # print(json.dumps(newEle, ensure_ascii=False))
+
+      col += 1
+      ajax_automation_test(current_criteria, col)
+
       return True
+
     return False
+
   except WebDriverException:
     pass
  
-def ajax_automation_test(col):
+def ajax_automation_test(criteria, col):
   global chrome_driver
-  chrome_driver.get("http://twebi.net/workflow/demo/redListEval/no-cy.html?ns=B&col=" + str(col))
-
+  chrome_driver.get("http://twebi.net/workflow/demo/redListEval/no-cy.html?ns=" + criteria + "&col=" + str(col))
   #wait for ajax items to load
   WebDriverWait(chrome_driver, 10).until(
     ajax_complete, "Timeout waiting for page to load")
@@ -42,6 +63,9 @@ def ajax_automation_test(col):
 
 with Xvfb() as xvfb:
   chrome_driver = webdriver.Chrome('/opt/bin/chromedriver')  # Optional argument, if not specified will search path.
-  ajax_automation_test(col)
-
+  for cri in criterias:
+    col = start_from
+    current_criteria = cri
+    ajax_automation_test(cri, col)
+  print(json.dumps(res))
 

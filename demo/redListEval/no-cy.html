@@ -20,6 +20,8 @@
     <div id='show_text_data'></div>
     <div id='display_message_box'></div-->
     <div id='workflow_done_assertion'></div>
+    <div id='redlist_criteria'></div>
+    <div id='redlist_species'></div>
     <div id='workflow_result'></div>
   </div>
   <!--div id='export_options'>
@@ -49,13 +51,7 @@
   var ns = url_query.ns || 'B';
   var col = url_query.col || '5';
 
-  function relocation () {
-    window.location.href='no-cy.html?ns='+$('#criteria').val()+'&'+'col='+$('#species').val();
-  }
-
-
   function settings () {
-
 
     var vnames = [];
     var vname_ids = [];
@@ -67,8 +63,12 @@
     }
 
     var criteria = ['A', 'B', 'C', 'D', 'E'];
-    $('#criteria').html(buildOpts(criteria, undefined, ns));
-    $('#species').html(buildOpts(vname_ids, vnames, col));
+    //$('#criteria').html(buildOpts(criteria, undefined, ns));
+    //$('#species').html(buildOpts(vname_ids, vnames, col));
+    $('#redlist_criteria').html(ns);
+    $('#redlist_species').html(function(){
+      return vnames[vname_ids.indexOf(col)];
+    });
     $wf().runWith("./wfml/redListEval."+ns+".txt", ns, data[col]);
 
   }
