@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="showRedlistEvalResult">
+<head>
+<meta charset="utf-8">
+<script src="./js/angular.js"></script>
+<script src="./js/loadJsonController.js"></script>
+<title>Red List of Taiwan Bird</title>
+</head>
+
+<style>
+.css_table {
+  display:table;
+}
+
+.css_tr {
+  display: table-row;
+}
+
+.css_td {
+  display: table-cell;
+  border-bottom: solid 1px;
+  border-right: solid 1px;
+}
+
+</style>
+
+<body ng-controller="loadJsonController">
+<div class='css_table'>
+  <div class='css_tr'>
+    <div class='css_td'>欄位</div>
+    <div class='css_td'>物種</div>
+    <div class='css_td'>學名</div>
+    <div class='css_td'>A</div>
+    <div class='css_td'>B</div>
+    <div class='css_td'>C</div>
+    <div class='css_td'>D</div>
+  </div>
+  <div ng-repeat='redlist_res in res' class='css_tr'/>
+    <div class='css_td'>{{redlist_res.col}}</div>
+    <div class='css_td'>{{redlist_res.species}}</div>
+    <div class='css_td'>{{redlist_res.species_sci}}</div>
+    <div class='css_td'><a target="_blank" ng-href="{{redlist_res.a}}A">{{redlist_res.A || 'Unevaluated'}}</a></div>
+    <div class='css_td'><a target="_blank" ng-href="{{redlist_res.a}}B">{{redlist_res.B || 'Unevaluated'}}</a></div>
+    <div class='css_td'><a target="_blank" ng-href="{{redlist_res.a}}C">{{redlist_res.C || 'Unevaluated'}}</a></div>
+    <div class='css_td'><a target="_blank" ng-href="{{redlist_res.a}}D">{{redlist_res.D || 'Unevaluated'}}</a></div>
+  </div>
+</div>
+</body>
+</html>
+
+

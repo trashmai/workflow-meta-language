@@ -14,7 +14,7 @@ from selenium.common.exceptions import WebDriverException
 from xvfbwrapper import Xvfb
 import json
 
-criterias = ['B', 'D']
+criterias = ['A', 'B', 'C', 'D']
 current_criteria = ''
 res = []
 start_from = 3
@@ -32,14 +32,16 @@ def ajax_complete(driver):
   try:
     # print driver.execute_script("return !!localStorage.redListVars")
     if 'workflow done' == driver.execute_script("return jQuery('#workflow_done_assertion').html()"):
-      species = driver.execute_script("return jQuery('#redlist_species').html()")
-      if ("" == species):
+      species_mix = driver.execute_script("return jQuery('#redlist_species').html()").split('|')
+      if ("" == species_mix[0]) and ("" == species_mix[1]):
         return True
       result = driver.execute_script("return jQuery('#workflow_result').html()")
       newEle = {}
-      newEle['species'] = species
+      newEle['species'] = species_mix[0]
+      newEle['species_sci'] = species_mix[1]
+      newEle['col'] = col
       newEle[current_criteria] = result
-      res = create_on_exist_update(haystack=res, dict_id='species', needle=species ,key=current_criteria, value=result, new_element=newEle)
+      res = create_on_exist_update(haystack=res, dict_id='species', needle=species_mix[0] ,key=current_criteria, value=result, new_element=newEle)
       # print(json.dumps(newEle, ensure_ascii=False))
 
       col += 1
@@ -58,7 +60,6 @@ def ajax_automation_test(criteria, col):
   #wait for ajax items to load
   WebDriverWait(chrome_driver, 10).until(
     ajax_complete, "Timeout waiting for page to load")
- 
   assert "workflow.js" in chrome_driver.page_source
 
 with Xvfb() as xvfb:
@@ -68,4 +69,4 @@ with Xvfb() as xvfb:
     current_criteria = cri
     ajax_automation_test(cri, col)
   print(json.dumps(res))
-
+  chrome_driver.quit()

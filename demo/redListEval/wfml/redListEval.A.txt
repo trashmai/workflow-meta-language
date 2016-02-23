@@ -1,12 +1,14 @@
 START
 //define function "inputYesNo", parameter for prompt message/question
-FUNC inputYesNo 族群是否有衰減的現象？
+//FUNC inputYesNo 族群是否有衰減的現象？
+//為了批次先假設都有衰減
+SET inputYesNo Y
 EQ inputYesNo N	GOTO NF
 EQ inputYesNo Y	GOTO OverTenYearsOr3Gens
 
 OverTenYearsOr3Gens
 FUNC toYears a1,a5,a6
-LT ToYears 10 GOTO NF
+LT toYears 10	GOTO NF
 
 WhenDoesReductionHappen
 // 缺少"跨過去到未來"的欄位

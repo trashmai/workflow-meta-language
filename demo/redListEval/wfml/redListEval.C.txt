@@ -15,7 +15,9 @@ LT cd1 250	SET RedListClass.C CR
 EQ RedListClass.C NF	GOTO NF
 
 PopulationSizeDown
-FUNC inputYesNo 族群是否有持續下降？
+//FUNC inputYesNo 族群是否有持續下降？
+//為了批次先假設都有下降
+SET inputYesNo Y
 EQ inputYesNo N	GOTO NF
 
 PopulationSizeDownRateEstimatable

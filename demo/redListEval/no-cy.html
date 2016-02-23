@@ -3,40 +3,18 @@
 <link href="/workflow/css/cy-style.css" rel="stylesheet" />
 <link href="./css/demo.css" rel="stylesheet" />
 <script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
-<!--script src="/workflow/js/cytoscape.js"></script>
-<script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cose-bilkent/1.0.2/cytoscape-cose-bilkent.js"></script>
-<script src="/workflow/js/workflow-cy.js"></script-->
 <script src='/workflow/js/common.js'></script>
 <script src='./js/redlist-export-img.js'></script>
 </head>
 <body>
-  <!--div id='display_message_box'></div-->
 
   <div id='cy_canvas'></div>
-
   <div id='blabla_wrapper'>
-    <!--div id='wf_label'></div>
-    <div id='menu'>Criteria<select id='criteria' name='criteria' onchange='relocation()'></select>Speies<select id='species' name='species' onchange='relocation()'></select></div>
-    <div id='show_text_data'></div>
-    <div id='display_message_box'></div-->
     <div id='workflow_done_assertion'></div>
     <div id='redlist_criteria'></div>
     <div id='redlist_species'></div>
     <div id='workflow_result'></div>
   </div>
-  <!--div id='export_options'>
-    <div class='options_wrapper'>
-      <label>輸出選項</label><input type='button' name='export_img' value='輸出' onclick='export_image()'/><a id='link_for_exported'></a><br/>
-      <label>範圍</label>
-      <input name='image_scope' type='radio' value='full' checked='checked'>完整
-      <input name='image_scope' type='radio' value='viewport'>部份
-      <br/>
-      <label>格式</label>
-      <input name='image_format' type='radio' value='png' checked='checked'>PNG
-      <input name='image_format' type='radio' value='jpg'>JPG
-    </div>
-  </div-->
-
 
   <script src='/workflow/js/workflow.js'></script>
   <script src='./js/wf-plugin/wf-redlist.shared.js'></script>
@@ -54,11 +32,13 @@
   function settings () {
 
     var vnames = [];
+    var snames = [];
     var vname_ids = [];
 
     for (var idx in data) {
-      var vname = data[idx]['欄位編號'];
+      var vname = data[idx]['欄位編號'] + data[idx]['n3'];
       vnames.push(vname);
+      snames.push(data[idx]['n1']);
       vname_ids.push(idx);
     }
 
@@ -67,7 +47,7 @@
     //$('#species').html(buildOpts(vname_ids, vnames, col));
     $('#redlist_criteria').html(ns);
     $('#redlist_species').html(function(){
-      return vnames[vname_ids.indexOf(col)];
+      return (vnames[vname_ids.indexOf(col)]||'') + '|' + (snames[vname_ids.indexOf(col)]||'');
     });
     $wf().runWith("./wfml/redListEval."+ns+".txt", ns, data[col]);
 

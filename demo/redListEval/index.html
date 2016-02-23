@@ -61,7 +61,7 @@
     var vname_ids = [];
 
     for (var idx in data) {
-      var vname = data[idx]['欄位編號'];
+      var vname = data[idx]['欄位編號'] + data[idx]['n3'];
       vnames.push(vname);
       vname_ids.push(idx);
     }
