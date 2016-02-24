@@ -60,10 +60,17 @@
     var vnames = [];
     var vname_ids = [];
 
+    var skip_num = 2;
+    var data_counter = 0;
     for (var idx in data) {
+      if (data_counter < skip_num) {
+        data_counter += 1;
+        continue;
+      }
       var vname = data[idx]['欄位編號'] + data[idx]['n3'];
       vnames.push(vname);
       vname_ids.push(idx);
+      data_counter += 1;
     }
 
     var criteria = ['A', 'B', 'C', 'D', 'E'];
