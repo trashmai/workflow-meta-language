@@ -32,7 +32,7 @@ EQ category A1	LTE a4 -70	SET RedListClass EN
 EQ category A1	LTE a4 -90	SET RedListClass CR
 NE category A1	LTE a4 -30	SET RedListClass VU
 NE category A1	LTE a4 -50	SET RedListClass EN
-NE category A1	LTE a4 -70	SET RedListClass CR
+NE category A1	LTE a4 -80	SET RedListClass CR
 EQ RedListClass NF	GOTO NF
 GOTO BasisOfReduction
 
