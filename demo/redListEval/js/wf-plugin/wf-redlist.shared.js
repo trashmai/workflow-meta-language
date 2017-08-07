@@ -14,6 +14,23 @@
     $wf.cy_add([lblNode]);
 
     return vname + '<br/>' + sname;
-
   }
+
+  $wf.shared.numeric_min = function (api_data, argStr) {
+    var data = $wf._toJsonData(argStr, false);
+    var min = null;
+    for (var i in data) {
+      if (data.hasOwnProperty(i)) {
+        if ($.isNumeric(data[i]) && min === null) {
+          min = data[i];
+        }
+        else if ($.isNumeric(data[i]) && data[i] < min) {
+          min = data[i];
+        }
+      }
+    }
+    return min;
+  }
+
+
 }) (window);

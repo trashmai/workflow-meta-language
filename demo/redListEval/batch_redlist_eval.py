@@ -56,9 +56,9 @@ def ajax_complete(driver):
  
 def ajax_automation_test(criteria, col):
   global chrome_driver
-  chrome_driver.get("http://twebi.net/workflow/demo/redListEval/no-cy.html?ns=" + criteria + "&col=" + str(col))
+  chrome_driver.get("http://twebi.net/workflow/demo/redListEval/no-cy.html?src=fish1_2&ns=" + criteria + "&col=" + str(col))
   #wait for ajax items to load
-  WebDriverWait(chrome_driver, 10).until(
+  WebDriverWait(chrome_driver, 30).until(
     ajax_complete, "Timeout waiting for page to load")
   assert "workflow.js" in chrome_driver.page_source
 

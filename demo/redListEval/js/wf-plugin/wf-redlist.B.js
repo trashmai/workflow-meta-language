@@ -100,10 +100,26 @@
       Bb.push('(i)');
       Bb.push('(iii)');
     }
-    else if (['B','C','D'].indexOf(data.b18)) {
+    else if (['B','C','D'].indexOf(data.b18) > -1) {
       Bb.push('(ii)');
       Bb.push('(iii)');
     }
+
+    var hasA = false;
+    var hasBCD = false;
+    if (!!data.b18)
+    data.b18.replace(' ', '').split(',').forEach(function(e) {
+      if (['A'].indexOf(e) > -1) {
+        hasA = true;
+      }
+      if (['B','C','D'].indexOf(e) > -1) {
+        hasBCD = true;
+      }
+    });
+    if (hasA && hasBCD) {
+      Bb = ['(i)', '(ii)', '(iii)'];
+    }
+
     if (data.b23 == 'A' || data.b24 == 'A') {
       num++;
       Bb.push('(iv)');
@@ -127,16 +143,32 @@
     var Bc = [];
 
     // test output
-    data.b29 = 'Y';
+    // data.b29 = 'Y';
 
     if (data.b29 == 'Y') num++;
 
     if (data.b30 == 'A') {
       Bc.push('(i)');
     }
-    else if (['B','C','D'].indexOf(data.b30)) {
+    else if (['B','C','D'].indexOf(data.b30) > -1) {
       Bc.push('(ii)');
     }
+
+    var hasA = false;
+    var hasBCD = false;
+    if (!!data.b30)
+    data.b30.replace(' ', '').split(',').forEach(function(e) {
+      if (['A'].indexOf(e) > -1) {
+        hasA = true;
+      }
+      if (['B','C','D'].indexOf(e) > -1) {
+        hasBCD = true;
+      }
+    });
+    if (hasA && hasBCD) {
+      Bc = ['(i)', '(ii)'];
+    }
+
 
     if (data.b33 == 'Y') {
       num++;
@@ -185,7 +217,7 @@
     var b1 = [], b2 = [];
 
     if (data['RedListClass.Ba'] != 'NF') {
-      sub_a = 'a' + data['RedListClass.Ba'];
+      sub_a = 'a';
       b1.push(sub_a);
       b2.push(sub_a);
     }

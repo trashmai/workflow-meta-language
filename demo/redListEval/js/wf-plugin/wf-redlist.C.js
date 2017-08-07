@@ -28,24 +28,32 @@
     if (data['RedListClass.C1'] != 'NF') res_sub.push('C1');
 
 
+    var hasC2 = false;
     if (data['RedListClass.C2a'] != 'NF') {
-      sub_2a = 'a' + data['RedListClass.C2a'];
+      hasC2 = true;
+      sub_2a = data['RedListClass.C2a'];
       c2a.push(sub_2a);
     }
 
     if (data['RedListClass.C2b'] != 'NF') {
-      sub_2b = 'b' + data['RedListClass.C2b'];
+      hasC2 = true;
+      sub_2b = data['RedListClass.C2b'];
       c2b.push(sub_2b);
     }
 
-    c2a.join(',');
-    c2b.join(',');
+    c2a = c2a.join(',');
+    c2b = c2b.join(',');
 
+    var c2_sub = []
     if (c2a != '') {
-      res_sub.push(c2a);
+      c2_sub.push(c2a);
     }
     if (c2b != '') {
-      res_sub.push(c2b);
+      c2_sub.push(c2b);
+    }
+
+    if (c2_sub.join(',') != '') {
+      res_sub.push('C2' + c2_sub.join(','));
     }
 
     if (res_sub.length == 0) res = 'NF';

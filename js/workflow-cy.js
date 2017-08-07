@@ -66,8 +66,8 @@ $(function(){ // on dom ready
           'source-arrow-shape': 'circle',
           //'line-color': 'data(faveColor)',
           'line-color': 'mapData(strength, 70, 100, #6FB1FC, blue)',
-          //'source-arrow-color': 'mapData(strength, 70, 100, #DC90DC, red)',
-          //'target-arrow-color': 'mapData(strength, 70, 100, #DC90DC, red)'
+          'source-arrow-color': 'mapData(strength, 70, 100, #6FB1FC, blue)',
+          'target-arrow-color': 'mapData(strength, 70, 100, #6FB1FC, blue)'
         })
       .selector('edge.function_call')
         .css({

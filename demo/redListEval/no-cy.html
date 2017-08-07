@@ -1,14 +1,11 @@
 <html>
 <head>
-<link href="/workflow/css/cy-style.css" rel="stylesheet" />
-<link href="./css/demo.css" rel="stylesheet" />
 <script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
 <script src='/workflow/js/common.js'></script>
-<script src='./js/redlist-export-img.js'></script>
+<script src='./js/config.js'></script>
 </head>
 <body>
 
-  <div id='cy_canvas'></div>
   <div id='blabla_wrapper'>
     <div id='workflow_done_assertion'></div>
     <div id='redlist_criteria'></div>
@@ -57,9 +54,12 @@
   function show () {
  
     if (!localStorage.redListVars) {
+
+      var src = url_query['src'];
+      var gss = dataSrc[src].gss;
+
       console.log('read data from google spreadsheet');
       var timestamp = new Date().getTime();
-      var gss = 'https://docs.google.com/spreadsheets/d/10UnX17y5Yfj0MJoPDlNmrUCOER4xnF-OodNgx6bb6T4/pub?gid=1851777821&single=true&output=tsv';
       $.get("./service/gspreadsheet.php?timestamp="+timestamp+"&q="+encodeURIComponent(gss)).done(function(jsonString){
         localStorage.redListVars = jsonString;
         data = JSON.parse(localStorage.redListVars);

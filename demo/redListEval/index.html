@@ -6,6 +6,7 @@
 <script src="/workflow/js/cytoscape.js"></script>
 <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-cose-bilkent/1.0.2/cytoscape-cose-bilkent.js"></script>
 <script src="/workflow/js/workflow-cy.js"></script>
+<script src="./js/config.js"></script>
 <script src='/workflow/js/common.js'></script>
 <script src='./js/redlist-export-img.js'></script>
 </head>
@@ -49,10 +50,12 @@
   var ns = url_query.ns || 'B';
   var col = url_query.col || '5';
 
-  function relocation () {
-    window.location.href='?ns='+$('#criteria').val()+'&'+'col='+$('#species').val();
-  }
+  var src = url_query['src'];
+  var gss = dataSrc[src].gss;
 
+  function relocation () {
+    window.location.href='?src=' + src + '&ns='+$('#criteria').val()+'&'+'col='+$('#species').val();
+  }
 
   function settings () {
 
@@ -60,7 +63,7 @@
     var vnames = [];
     var vname_ids = [];
 
-    var skip_num = 2;
+    var skip_num = url_query.skip_num || 2;
     var data_counter = 0;
     for (var idx in data) {
       if (data_counter < skip_num) {
@@ -83,9 +86,9 @@
   var data;
   function show () {
  
-    if (!data) {  
+    if (!data) {
+
       var timestamp = new Date().getTime();
-      var gss = 'https://docs.google.com/spreadsheets/d/10UnX17y5Yfj0MJoPDlNmrUCOER4xnF-OodNgx6bb6T4/pub?gid=1851777821&single=true&output=tsv';
       $.get("./service/gspreadsheet.php?timestamp="+timestamp+"&q="+encodeURIComponent(gss)).done(function(jsonString){
         data = JSON.parse(jsonString);
         settings();

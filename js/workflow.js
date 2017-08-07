@@ -242,6 +242,9 @@
 
       if (toString) {
         if (value===undefined) {
+          if (String(variable) == 'NULL') {
+            return null;
+          }
           e(h_var_arr.join('.') + ' is not a variable, treated as STRING.');
           return String(variable);
         }

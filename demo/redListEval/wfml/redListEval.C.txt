@@ -8,10 +8,12 @@ SET RedListClass.C2b NF
 SET RedListClass.C NF
 
 PopulationSize
-// cd1,cd2,cd3 暫且先採用cd1
-LT cd1 10000	SET RedListClass.C VU
-LT cd1 2500	SET RedListClass.C EN
-LT cd1 250	SET RedListClass.C CR
+// pick minimum from cd1,cd2,cd3
+FUNC numeric_min cd1,cd2,cd3
+SET populationSize numeric_min
+LT populationSize 10000	SET RedListClass.C VU
+LT populationSize 2500	SET RedListClass.C EN
+LT populationSize 250	SET RedListClass.C CR
 EQ RedListClass.C NF	GOTO NF
 
 PopulationSizeDown

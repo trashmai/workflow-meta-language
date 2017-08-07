@@ -2,8 +2,10 @@
 
 $var_col = 0;
 $data_start_col = 1;
+$path = $_GET['q'];
+//$path = 'http://twebi.net/workflow/demo/redListEval/tmp/fish1_1.csv';
+$fp = fopen($path, 'r');
 
-$fp = fopen($_GET['q'], 'r');
 $lines = array();
 
 while ($data = fgetcsv($fp, 0, "\t")) {
