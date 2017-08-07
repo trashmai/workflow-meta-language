@@ -2,7 +2,7 @@ START
 
 EOO
 // EOO workflow
-FUNC fromEOO b9,b2,b10,b11,b3,b4
+FUNC fromEOO b9,b2,b10,b11,b3,b4 //service/eoo-aoo.php false
 LT fromEOO 100	SET RedListClass.B1 CR	GOTO B1a
 LT fromEOO 5000	SET RedListClass.B1 EN	GOTO B1a
 LT fromEOO 20000	SET RedListClass.B1 VU	GOTO B1a
@@ -27,7 +27,7 @@ LT NumOfCriticalChanges 1	SET RedListClass.Bc NF
 
 AOO
 // AOO workflow
-FUNC fromAOO b8,b1 //eoo-aoo.php
+FUNC fromAOO b8,b1 //service/eoo-aoo.php true
 LT fromAOO 10	SET RedListClass.B2 CR	GOTO B2a
 LT fromAOO 500	SET RedListClass.B2 EN	GOTO B2a
 LT fromAOO 2000	SET RedListClass.B2 VU	GOTO B2a
