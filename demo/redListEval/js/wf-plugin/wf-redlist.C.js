@@ -8,7 +8,7 @@
   $wf.C.outputResult = function () {
     var argStr = 'RedListClass,RedListClass.C,RedListClass.C1,RedListClass.C2,RedListClass.C2a,RedListClass.C2b';
     var data = $wf._toJsonData(argStr, false);
-    var rc = ['NF', 'VU', 'EN','CR'];
+    var rc = ['NF', 'DD', 'LC', 'NT', 'VU', 'EN','CR'];
     var C = rc.indexOf(data['RedListClass.C']);
     var C1 = rc.indexOf(data['RedListClass.C1']);
     var C2 = rc.indexOf(data['RedListClass.C2']);
@@ -56,16 +56,18 @@
       res_sub.push('C2' + c2_sub.join(','));
     }
 
-    if (res_sub.length == 0) res = 'NF';
+    // if (res_sub.length == 0) res = 'NF';
 
     var m;
-    if (res != 'NF') {
+    var exception_status = ['NF','DD','LC'];
+    var exception_status_idx = exception_status.indexOf(res);
+    if (exception_status_idx == -1) {
       res = res + ' ' + res_sub.join('+');
       m = res;
       $wf.o(m, 'color:red;', 'h1');
     }
     else {
-      m = 'Not Feasible';
+      m = exception_status[exception_status_idx];
       $wf.o(m, 'color:red;', 'h1');
     }
     return m;

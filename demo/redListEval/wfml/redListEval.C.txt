@@ -11,30 +11,32 @@ PopulationSize
 // pick minimum from cd1,cd2,cd3
 FUNC numeric_min cd1,cd2,cd3
 SET populationSize numeric_min
-LT populationSize 10000	SET RedListClass.C VU
+LT populationSize 20000	SET RedListClass.C NT	SET secondaryCriteriaRes NT
+LT populationSize 10000	SET RedListClass.C VU	SET secondaryCriteriaRes VU
 LT populationSize 2500	SET RedListClass.C EN
 LT populationSize 250	SET RedListClass.C CR
-EQ RedListClass.C NF	GOTO NF
+EQ RedListClass.C NF	GOTO REAL_NF
 
 PopulationSizeDown
-//FUNC inputYesNo 族群是否有持續下降？
-//為了批次先假設都有下降
-SET inputYesNo Y
-EQ inputYesNo N	GOTO NF
+EQ b26 A	GOTO PopulationSizeDownRateEstimatableTestC1
+EQ b27 A	GOTO PopulationSizeDownRateEstimatableTestC1
+EQ b33 Y	GOTO PopulationSizeDownRateEstimatableTestC1
+EQ b35 Y	GOTO PopulationSizeDownRateEstimatableTestC1
+GOTO REAL_NF
 
-PopulationSizeDownRateEstimatable
+PopulationSizeDownRateEstimatableTestC1
 //C1
 //有資料欄位可表達EN與CR嗎？
-EQ b26 A	GOTO SetC1toVU
-EQ b27 A	GOTO SetC1toVU
-GOTO DownRateUnknown
+EQ b26 A	GOTO SetC1toSecondaryCriteriaRes
+EQ b27 A	GOTO SetC1toSecondaryCriteriaRes
+GOTO DownRateUnknownTestC2
 
-SetC1toVU
-SET RedListClass.C1 VU
+SetC1toSecondaryCriteriaRes
+SET RedListClass.C1 secondaryCriteriaRes
 
-DownRateUnknown
+DownRateUnknownTestC2
 // a(i)
-LT cd6 1000	SET RedListClass.C2 VU	SET RedListClass.C2a a(i)
+LT cd6 1000	SET RedListClass.C2 secondaryCriteriaRes	SET RedListClass.C2a a(i)
 LT cd6 250	SET RedListClass.C2 EN	SET RedListClass.C2a a(i)
 LT cd6 50	SET RedListClass.C2 CR	SET RedListClass.C2a a(i)
 // a(ii) 沒有欄位, 先略過
@@ -48,10 +50,13 @@ EndemicSpeciesCalibration
 // 這要怎麼處理？ rc1,rc2,rc3,rc4
 
 C1orC2
-EQ RedListClass.C1 NF	EQ RedListClassC2 NF	GOTO NF
+FUNC checkDD cd1,cd2,cd3,cd6,b26,b27,b33,b35
+EQ RedListClass.C1 NF	EQ RedListClass.C2 NF	SET RedListClass.C checkDD
 GOTO FIN
 
-NF
+
+REAL_NF
 SET RedListClass NF
+
 
 FIN

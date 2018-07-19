@@ -75,12 +75,14 @@
 
   $wf.A.outputResult = function () {
     var m;
-    if ($wf.A.RedListClass !== 'NF') {
+    var exception_status = ['NF','DD','LC'];
+    var exception_status_idx = exception_status.indexOf($wf.A.RedListClass);
+    if (exception_status_idx == -1) {
       m = $wf.A.RedListClass + ' ' + $wf.A.category + $wf.A.subCriteria;
       $wf.o(m, 'color:red;', 'h1');
     }
     else {
-      m = 'Not Feasible';
+      m = exception_status[exception_status_idx];
       $wf.o(m, 'color:red;', 'h1');
     }
     return m;

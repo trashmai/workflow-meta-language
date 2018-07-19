@@ -3,12 +3,14 @@ START
 
 ProbabilityOfExtinctionInTheWildFuture50Year
 //標準不完全跟IUCN一樣
+GTE e1 0.05	SET RedListClass NT	SET Subcriteria E	GOTO FIN
 GTE e1 0.1	SET RedListClass VU	SET Subcriteria E	GOTO FIN
 GTE e1 0.2	SET RedListClass EN	SET Subcriteria E	GOTO FIN
 GTE e1 0.5	SET RedListClass CR	SET Subcriteria E	GOTO FIN
 GOTO NF
 
 NF
-SET RedListClass NF
+FUNC checkDD e1
+SET RedListClass checkDD
 
 FIN

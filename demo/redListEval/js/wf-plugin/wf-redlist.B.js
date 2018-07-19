@@ -187,28 +187,37 @@
     return num;
   }
 
-  $wf.B.b1b2_sustained = function (api_data, argStr) {
+  $wf.B.b1b2_sustained = function (api_data, argStr, n) {
     if (api_data) return api_data;
     var data = $wf._toJsonData(argStr, false);
     var num = 0;
     if (data['RedListClass.Ba'] != 'NF') num++;
     if (data['RedListClass.Bb'] != 'NF') num++;
     if (data['RedListClass.Bc'] != 'NF') num++;
-    if (num > 1) {
+    if (num >= n) {
       return 'Y';
     }
     $wf.m(JSON.stringify($wf.B));
     return 'N';
   }
 
+  $wf.B.b1b2_sustained_ge2 = function (api_data, argStr) {
+    return $wf.B.b1b2_sustained(api_data, argStr, 2);
+  }
+
+  $wf.B.b1b2_sustained_ge1 = function (api_data, argStr) {
+    return $wf.B.b1b2_sustained(api_data, argStr, 1);
+  }
+
   $wf.B.outputResult = function () {
-    var argStr = 'RedListClass,RedListClass.B1,RedListClass.B2,RedListClass.Ba,RedListClass.Bb,RedListClass.Bc';
+    var argStr = 'RedListClass,RedListClass.B1,RedListClass.B2,RedListClass.Ba,RedListClass.Bb,RedListClass.Bc,RedListClass.Bfallback';
     var data = $wf._toJsonData(argStr, false);
-    var rc = ['NF', 'VU', 'EN','CR'];
+    var rc = ['NF', 'DD', 'LC', 'NT', 'VU', 'EN','CR'];
     var B = rc.indexOf(data['RedListClass']);
     var B1 = rc.indexOf(data['RedListClass.B1']);
     var B2 = rc.indexOf(data['RedListClass.B2']);
     var Ba = rc.indexOf(data['RedListClass.Ba']);
+    var Bfallback = rc.indexOf(data['RedListClass.Bfallback']);
     var res = rc[Math.max(Math.max(Math.max(B1, B2), Ba),B)];
     var res_sub = [];
 
@@ -223,13 +232,13 @@
     }
 
     if (data['RedListClass.Bb'] != 'NF') {
-      sub_b = 'b' + data['RedListClass.Bb'];
+      sub_b = 'b' + (data['RedListClass.Bb']||"");
       b1.push(sub_b);
       b2.push(sub_b);
     }
 
     if (data['RedListClass.Bc'] != 'NF') {
-      sub_c = 'c' + data['RedListClass.Bc'];
+      sub_c = 'c' + (data['RedListClass.Bc']||"");
       b1.push(sub_c);
       b2.push(sub_c);
     }
@@ -245,14 +254,16 @@
     }
 
     var m;
-    if (res != 'NF') {
+    var exception_status = ['NF','DD','LC'];
+    var exception_status_idx = exception_status.indexOf(res);
+    if (exception_status_idx==-1) {
       res = res + ' ' + res_sub.join('+');
       m = res;
       $wf.o(m, 'color:red;', 'h1');
     }
     else {
-      m = 'Not Feasible';
-      $wf.o('Not Feasible', 'color:red;', 'h1');
+      m = exception_status[exception_status_idx];
+      $wf.o(m, 'color:red;', 'h1');
     }
     return m;
   }

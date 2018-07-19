@@ -1,22 +1,32 @@
 START
 // Criteria D - Very small or restricted population
+SET RedListClass NF
 
 AdultCountInPopulation
 FUNC numeric_min cd1,cd2,cd3
 SET adultCount numeric_min
 EQ adultCount NULL	GOTO AOOorNumOfLocationIsRestricted
+LT adultCount 2500	SET RedListClass NT	SET Subcriteria D1
 LT adultCount 1000	SET RedListClass VU	SET Subcriteria D1
 LT adultCount 250	SET RedListClass EN	SET Subcriteria D
 LT adultCount 50	SET RedListClass CR	SET Subcriteria D	GOTO FIN
 
 AOOorNumOfLocationIsRestricted
-GTE b1 20	GTE b8 20	GT b15 5	GOTO NF
+LT b1 20	SET RedListClass NT	SET Subcriteria D2	GOTO ThreatExistsAndBadEffect
+LT b8 20	SET RedListClass NT	SET Subcriteria D2	GOTO ThreatExistsAndBadEffect
+LT b15 5	SET RedListClass NT	SET Subcriteria D2	GOTO ThreatExistsAndBadEffect
+LT b1 50	SET RedListClass NT	SET Subcriteria D2	GOTO ThreatExistsAndBadEffect
+LT b8 50	SET RedListClass NT	SET Subcriteria D2	GOTO ThreatExistsAndBadEffect
+LT b15 10	SET RedListClass NT	SET Subcriteria D2	GOTO ThreatExistsAndBadEffect
+GOTO CHKDD
 
 ThreatExistsAndBadEffect
 // find no cd9 and cd10
-GOTO NF
+// if some condition, set redlistclass to VU
+GOTO FIN
 
-NF
-SET RedListClass NF
+CHKDD
+FUNC checkDD cd1,cd2,cd3,cd9,cd10,b1,b8,b15
+EQ RedListClass NF	SET RedListClass checkDD
 
 FIN

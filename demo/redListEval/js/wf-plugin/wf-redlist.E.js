@@ -8,11 +8,13 @@
   $wf.E.outputResult = function () {
     var argStr = 'RedListClass,Subcriteria';
     var data = $wf._toJsonData(argStr, false);
-    if (!!data.RedListClass && data.RedListClass!='NF' && !!data.Subcriteria) {
+    var exception_status = ['NF','DD','LC'];
+    var exception_status_idx = exception_status.indexOf(data.RedListClass);
+    if (!!data.RedListClass && exception_status_idx==-1 && !!data.Subcriteria) {
       return data.RedListClass + ' ' + data.Subcriteria;
     }
     else {
-      return 'Not Feasible';
+      return exception_status[exception_status_idx];
     }
   }
 

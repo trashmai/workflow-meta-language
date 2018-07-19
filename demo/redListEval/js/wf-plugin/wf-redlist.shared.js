@@ -32,5 +32,39 @@
     return min;
   }
 
+  $wf.shared.checkDD = function (api_data, argStr){
+    if (api_data) return api_data;
+    var data = $wf._toJsonData(argStr, false);
+    var dd = false;
+    for (var k in data) {
+      if (data.hasOwnProperty(k)) {
+        if (data[k] !== undefined) return "LC";
+      }
+    }
+    return 'DD';
+  }
+
+  /*
+  $wf.shared.checkDD = function (api_data, argStr){
+    if (api_data) return api_data;
+    var data = $wf._toJsonData(argStr, false);
+    var dd = false;
+    for (var k in data) {
+      if (data.hasOwnProperty(k)) {
+        // if (data[k] !== undefined) return "LC";
+        if (data[k] === undefined) {
+          dd = true;
+          break;
+        }
+      }
+    }
+    if (dd) {
+      return 'DD';
+    }
+    else {
+      return 'LC';
+    }
+  }
+  //*/
 
 }) (window);

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.4
 
 # Batch running redlist evaluation with help of headless chrome
 # Dependency:
@@ -14,7 +14,7 @@ from selenium.common.exceptions import WebDriverException
 from xvfbwrapper import Xvfb
 import json
 
-criterias = ['A', 'B', 'C', 'D']
+criterias = ['A', 'B', 'C', 'D', 'E']
 current_criteria = ''
 res = []
 start_from = 3
@@ -57,16 +57,21 @@ def ajax_complete(driver):
 def ajax_automation_test(criteria, col):
   global chrome_driver
   chrome_driver.get("http://twebi.net/workflow/demo/redListEval/no-cy.html?src=fish1_2&ns=" + criteria + "&col=" + str(col))
+  #chrome_driver.get("http://twebi.net/workflow/demo/redListEval/no-cy.html?src=fish1_1&ns=" + criteria + "&col=" + str(col))
   #wait for ajax items to load
   WebDriverWait(chrome_driver, 30).until(
     ajax_complete, "Timeout waiting for page to load")
   assert "workflow.js" in chrome_driver.page_source
 
 with Xvfb() as xvfb:
-  chrome_driver = webdriver.Chrome('/opt/bin/chromedriver')  # Optional argument, if not specified will search path.
+  chrome_options = webdriver.ChromeOptions()
+  chrome_options.add_argument('--no-sandbox')
+  chrome_driver = webdriver.Chrome('/opt/bin/chromedriver', chrome_options=chrome_options)  # Optional argument, if not specified will search path.
+  #print("Start!")
   for cri in criterias:
     col = start_from
     current_criteria = cri
+    #print(cri)
     ajax_automation_test(cri, col)
   print(json.dumps(res))
   chrome_driver.quit()
